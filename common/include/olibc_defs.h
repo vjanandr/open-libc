@@ -3,8 +3,8 @@
 #include <stdio.h>
 
 typedef enum olibc_retval_t_ {
-    OLIBC_SUCCESS,
-    OLIBC_FAILURE,
+    OLIBC_RETVAL_SUCCESS,
+    OLIBC_RETVAL_FAILURE,
 }olibc_retval_t;
 
 extern char* olibc_retval_get_string (olibc_retval_t retval);
