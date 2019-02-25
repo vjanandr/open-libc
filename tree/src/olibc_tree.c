@@ -27,9 +27,17 @@ olibc_retval_t olibc_tree_get_count (olibc_tree_handle handle, int *count)
 {
     olibc_tree_head_t *tree = NULL;
     if (!handle || ! count) {
-        return OLIBC_RETVAL_FAILURE; 
+        return OLIBC_RETVAL_FAILURE;
     }
     tree = handle;
     *count = tree->count;
+    return (OLIBC_RETVAL_SUCCESS);
+}
+
+olibc_retval_t olibc_tree_destroy(olibc_tree_handle *handle)
+{
+    olibc_tree_head_t *tree = *handle;
+    free (tree);
+    *handle = NULL;
     return (OLIBC_RETVAL_SUCCESS);
 }

@@ -8,6 +8,7 @@ typedef struct olibc_tree_node_t_ *olibc_tree_node_handle;
 
 extern olibc_tree_handle olibc_tree_create(char *name);
 extern olibc_retval_t olibc_tree_get_count(olibc_tree_handle handle, int *count);
-extern olibc_retval_t olibc_tree_get_name(olibc_tree_handle handle, const char **name);
+extern olibc_retval_t olibc_tree_get_name(olibc_tree_handle handle,
+                                        const char **name);
 extern olibc_retval_t olibc_tree_destroy(olibc_tree_handle *handle);
 #endif //__OLIBC_TREE_H__

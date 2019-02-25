@@ -27,14 +27,12 @@ treetest.o: olibc_tree.o ./tree/test/olibc_tree_test.c
 	$(cc) $(CFLAGS) $(INC_DIRS) -o treetest $^ -lcunit
 
 treetest: treetest.o
-	./treetest
-
+	valgrind --tool=memcheck --leak-check=full --error-exitcode=9 ./treetest || (echo "Leak detected"; exit 1)
 
 olibc_tree.o: ./tree/src/olibc_tree.c
 	$(cc) $(CFLAGS) $(INC_DIRS) -c $^
 
-
 .PHONY: clean
 
 clean:
-	rm -f *.o treetest
+	rm -f *.o treetest a.out
