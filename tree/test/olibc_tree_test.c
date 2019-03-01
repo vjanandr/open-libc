@@ -1,7 +1,8 @@
 #include <olibc_tree.h>
 #include <CUnit/Basic.h>
 olibc_tree_handle handle;
-char *tree_name = "Test Tree";
+char *tree_name_ = "Test Tree";
+int tree_data_[10] = {5, 7, 4, 2, 8, 1, 9, 3, 6, 10};
 
 olibc_cbk_ret_type_t test_tree_cmp_func (void *tree_data, void *data)
 {
@@ -27,7 +28,7 @@ void test_tree_create ()
 {
     olibc_tree_init_t init_struct;
     memset(&init_struct, 0,sizeof(olibc_tree_init_t));
-    init_struct.name = tree_name;
+    init_struct.name = tree_name_;
     init_struct.cmp_func = test_tree_cmp_func;
     handle = olibc_tree_create(OLIBC_TREE_TYPE_BST, &init_struct);
     CU_ASSERT_PTR_NOT_NULL(handle);
@@ -39,7 +40,7 @@ void test_tree_name ()
     olibc_retval_t retval;
     retval = olibc_tree_get_name(handle, &name);
     CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
-    CU_ASSERT_STRING_EQUAL(name, tree_name);
+    CU_ASSERT_STRING_EQUAL(name, tree_name_);
 }
 void test_tree_count ()
 {
@@ -67,14 +68,61 @@ void test_tree_type ()
 }
 void test_tree_add ()
 {
+    int count, i =0;
     olibc_retval_t retval;
-    int data = 10;
-    retval = olibc_tree_add_data(handle, &data);
-    CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
-    int count;
+
+    while (i < 10) {
+        retval = olibc_tree_add_data(handle, tree_data_+i);
+        CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
+        i++;
+    }
+
     retval = olibc_tree_get_count(handle, &count);
     CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
-    CU_ASSERT_EQUAL(count, 1);
+    CU_ASSERT_EQUAL(count, 10);
+}
+void test_tree_walk_cbk (void *data)
+{
+    int d = *(int *)data;
+    printf("%d ", d);
+}
+
+void test_tree_walk_inorder ()
+{
+    olibc_retval_t retval;
+
+    retval = olibc_tree_walk(handle, test_tree_walk_cbk,
+                             OLIBC_TREE_WALK_INORDER);
+    CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
+}
+
+void test_tree_walk_preorder ()
+{
+    olibc_retval_t retval;
+
+    retval = olibc_tree_walk(handle, test_tree_walk_cbk,
+                             OLIBC_TREE_WALK_PREORDER);
+    CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
+}
+void test_tree_walk_postorder ()
+{
+    olibc_retval_t retval;
+
+    retval = olibc_tree_walk(handle, test_tree_walk_cbk,
+                             OLIBC_TREE_WALK_POSTORDER);
+    CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
+}
+void test_tree_dup_check ()
+{
+    int count;
+    olibc_retval_t retval;
+
+    retval = olibc_tree_add_data(handle, tree_data_+0);
+    CU_ASSERT_TRUE(retval == OLIBC_RETVAL_DUPLICATE_DATA);
+
+    retval = olibc_tree_get_count(handle, &count);
+    CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
+    CU_ASSERT_EQUAL(count, 10);
 }
 int main ()
 {
@@ -111,6 +159,26 @@ int main ()
     }
     if (CU_add_test(psuite, "test_tree_add",
                 test_tree_add) == NULL) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+    if (CU_add_test(psuite, "test_tree_dup_check",
+                test_tree_dup_check) == NULL) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+    if (CU_add_test(psuite, "test_tree_walk_inorder",
+                test_tree_walk_inorder) == NULL) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+    if (CU_add_test(psuite, "test_tree_walk_preorder",
+                test_tree_walk_preorder) == NULL) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+    if (CU_add_test(psuite, "test_tree_walk_postorder",
+                test_tree_walk_postorder) == NULL) {
         CU_cleanup_registry();
         return CU_get_error();
     }
