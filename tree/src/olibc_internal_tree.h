@@ -2,6 +2,9 @@
 #define __OLIBC_INTERNAL_TREE_H__
 #include <olibc_tree.h>
 
+typedef int (*olibc_tree_level_func) (struct olibc_tree_head_t_ *tree,
+                                      void *data);
+
 typedef struct olibc_tree_node_ {
     void* data;
     struct olibc_tree_node_ *left;
@@ -13,6 +16,7 @@ typedef struct olibc_tree_head_t_ {
     int count;
     olibc_tree_type_t tree_type;
     olibc_tree_cmp_func cmp_func;
+    olibc_tree_level_func level_func;
     char *name;
 } olibc_tree_head_t;
 

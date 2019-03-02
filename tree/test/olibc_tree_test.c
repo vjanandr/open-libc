@@ -124,6 +124,35 @@ void test_tree_dup_check ()
     CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
     CU_ASSERT_EQUAL(count, 10);
 }
+
+void test_tree_level ()
+{
+    int level = 0;
+    olibc_retval_t retval;
+    retval = olibc_tree_get_type_level(handle, tree_data_+7, &level);
+    CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
+    CU_ASSERT_TRUE(level != 0);
+    printf(" %d ", level);
+    level = 0;
+    retval = olibc_tree_get_level(handle, tree_data_+7, &level);
+    CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
+    CU_ASSERT_TRUE(level != 0);
+    printf(" %d ", level);
+}
+void test_print_func (void *data, int level)
+{
+    level--;
+    level *= 10;
+    while (level--) printf(" ");
+    printf("%d\n\n\n", *(int *)data);
+}
+void test_tree_print ()
+{
+    olibc_retval_t retval;
+    printf("\n");
+    retval = olibc_tree_print(handle, test_print_func);
+    CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
+}
 int main ()
 {
     if (CUE_SUCCESS != CU_initialize_registry()) {
@@ -179,6 +208,16 @@ int main ()
     }
     if (CU_add_test(psuite, "test_tree_walk_postorder",
                 test_tree_walk_postorder) == NULL) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+    if (CU_add_test(psuite, "test_tree_level",
+                test_tree_level) == NULL) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+    if (CU_add_test(psuite, "test_tree_print",
+                test_tree_print) == NULL) {
         CU_cleanup_registry();
         return CU_get_error();
     }

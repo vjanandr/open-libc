@@ -1,6 +1,7 @@
 #ifndef __OLIBC_DEFS_H__
 #define __OLIBC_DEFS_H__
 #include <stdio.h>
+#include <stdint.h>
 
 typedef enum olibc_retval_t_ {
     OLIBC_RETVAL_SUCCESS,

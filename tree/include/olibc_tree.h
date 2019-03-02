@@ -16,6 +16,8 @@ typedef enum olibc_tree_walk_type_ {
 
 typedef olibc_cbk_ret_type_t (*olibc_tree_cmp_func)(void *treedata,
                                                     void *data);
+typedef void (*olibc_tree_print_func)(void *data,
+                                                      int level);
 
 typedef void (*olibc_tree_walk_func)(void *data);
 
@@ -52,4 +54,10 @@ extern olibc_retval_t olibc_tree_add_data(olibc_tree_handle handle,
 extern olibc_retval_t olibc_tree_walk(olibc_tree_handle handle,
                                       olibc_tree_walk_func walk_cbk,
                                       olibc_tree_walk_type_t walk_type);
+extern olibc_retval_t olibc_tree_get_type_level(olibc_tree_handle handle,
+                                           void *data, uint32_t *level);
+extern olibc_retval_t olibc_tree_get_level(olibc_tree_handle handle,
+                                           void *data, uint32_t *level);
+extern olibc_retval_t olibc_tree_print(olibc_tree_handle handle,
+                                       olibc_tree_print_func print_func);
 #endif //__OLIBC_TREE_H__
