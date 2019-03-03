@@ -129,12 +129,13 @@ void test_tree_level ()
 {
     int level = 0;
     olibc_retval_t retval;
-    retval = olibc_tree_get_type_level(handle, tree_data_+7, &level);
+    printf(" data = %d - ", *(tree_data_+1));
+    retval = olibc_tree_get_type_level(handle, tree_data_+1, &level);
     CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
     CU_ASSERT_TRUE(level != 0);
     printf(" %d ", level);
     level = 0;
-    retval = olibc_tree_get_level(handle, tree_data_+7, &level);
+    retval = olibc_tree_get_level(handle, tree_data_+1, &level);
     CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
     CU_ASSERT_TRUE(level != 0);
     printf(" %d ", level);

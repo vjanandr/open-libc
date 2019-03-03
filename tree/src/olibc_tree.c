@@ -248,7 +248,7 @@ olibc_tree_get_level (olibc_tree_handle handle, void *data,
     tree = handle;
     tree_node = tree->head;
     *level = 0;
-    *level = olibc_tree_get_level_util(tree_node, data, tree->cmp_func, 2);
+    *level = olibc_tree_get_level_util(tree_node, data, tree->cmp_func, 1);
     return OLIBC_RETVAL_SUCCESS;
 }
 
@@ -314,15 +314,15 @@ olibc_tree_bst_add_data (olibc_tree_head_t *tree, void *data)
     return retval;
 }
 
-void  olibc_tree_print_util (olibc_tree_node_t *node, 
-                             olibc_tree_print_func print_func, 
+void  olibc_tree_print_util (olibc_tree_node_t *node,
+                             olibc_tree_print_func print_func,
                              int level)
 {
-    if (!node) 
+    if (!node)
         return;
     olibc_tree_print_util(node->right, print_func,level+1);
     print_func(node->data, level);
-    olibc_tree_print_util(node->left, print_func,level+2);
+    olibc_tree_print_util(node->left, print_func,level+1);
 }
 
 olibc_retval_t olibc_tree_print (olibc_tree_handle handle,
