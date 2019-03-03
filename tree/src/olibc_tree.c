@@ -14,7 +14,7 @@ olibc_tree_create (olibc_tree_type_t tree_type,
     if (!init_struct) {
         return NULL;
     }
-    if (!init_struct->cmp_func)
+    if (!init_struct->cmp_cbk || !init_struct->dlt_cbk)
         return NULL;
 
     olibc_tree_head_t *tree = NULL;
@@ -22,11 +22,52 @@ olibc_tree_create (olibc_tree_type_t tree_type,
     if (!tree) return (NULL);
     memset(tree, 0, sizeof(*tree));
     tree->name = init_struct->name;
-    tree->cmp_func = init_struct->cmp_func;
+    tree->cmp_cbk = init_struct->cmp_cbk;
+    tree->dlt_cbk = init_struct->dlt_cbk;
     tree->tree_type = tree_type;
-//    tree->level_func = olibc_tree_bst_get_level;
+//    tree->level_cbk = olibc_tree_bst_get_level;
     return tree;
 }
+
+olibc_retval_t
+olibc_tree_delete_data_util (olibc_tree_node_t *tree_node,
+                             olibc_tree_cmp_cbk cmp_cbk,
+                             olibc_tree_dlt_cbk dlt_cbk,
+                             void *data)
+{
+    if (!tree_node) {
+        return OLIBC_RETVAL_SUCCESS;
+    }
+    olibc_cbk_ret_type_t cbk_retval = cmp_cbk(tree_node->data, data);
+
+    switch (cbk_retval) {
+        case OLIBC_CBK_RET_EQUAL:
+            dlt_cbk(data);
+            return OLIBC_RETVAL_SUCCESS;
+        case OLIBC_CBK_RET_GRTR:
+            return olibc_tree_delete_data_util(tree_node->right, cmp_cbk,
+                                               dlt_cbk, data);
+        case OLIBC_CBK_RET_LSR:
+            return olibc_tree_delete_data_util(tree_node->left, cmp_cbk,
+                                               dlt_cbk, data);
+        default:
+            return 0;
+    }
+    return OLIBC_RETVAL_SUCCESS;
+}
+
+olibc_retval_t
+olibc_tree_delete_data (olibc_tree_handle handle, void *data)
+{
+    olibc_tree_head_t *tree = NULL;
+    if (!handle) {
+        return OLIBC_RETVAL_FAILURE;
+    }
+    tree = handle;
+    return olibc_tree_delete_data_util(tree->head, tree->cmp_cbk,
+            tree->dlt_cbk, data);
+}
+
 
 olibc_retval_t
 olibc_tree_get_name (olibc_tree_handle handle , const char **name)
@@ -56,6 +97,8 @@ olibc_retval_t
 olibc_tree_destroy (olibc_tree_handle *handle)
 {
     olibc_tree_head_t *tree = *handle;
+    if (!tree)
+        return OLIBC_RETVAL_FAILURE;
     free (tree);
     *handle = NULL;
     return (OLIBC_RETVAL_SUCCESS);
@@ -97,7 +140,7 @@ olibc_tree_add_data (olibc_tree_handle handle,
 
 void
 olibc_tree_walk_indorder (olibc_tree_node_t *node,
-                          olibc_tree_walk_func walk_cbk)
+                          olibc_tree_walk_cbk walk_cbk)
 {
     if (!node) {
         return;
@@ -113,7 +156,7 @@ olibc_tree_walk_indorder (olibc_tree_node_t *node,
 
 void
 olibc_tree_walk_preorder (olibc_tree_node_t *node,
-                          olibc_tree_walk_func walk_cbk)
+                          olibc_tree_walk_cbk walk_cbk)
 {
     if (!node) {
         return;
@@ -130,7 +173,7 @@ olibc_tree_walk_preorder (olibc_tree_node_t *node,
 
 void
 olibc_tree_walk_postorder (olibc_tree_node_t *node,
-                          olibc_tree_walk_func walk_cbk)
+                          olibc_tree_walk_cbk walk_cbk)
 {
     if (!node) {
         return;
@@ -147,7 +190,7 @@ olibc_tree_walk_postorder (olibc_tree_node_t *node,
 
 olibc_retval_t
 olibc_tree_walk (olibc_tree_handle handle,
-                 olibc_tree_walk_func walk_cbk,
+                 olibc_tree_walk_cbk walk_cbk,
                  olibc_tree_walk_type_t walk_type)
 {
 
@@ -175,7 +218,7 @@ olibc_tree_walk (olibc_tree_handle handle,
 
 int
 olibc_tree_bst_get_level (olibc_tree_node_t *tree_node, void *data,
-                          olibc_tree_cmp_func cbk, int curr_level)
+                          olibc_tree_cmp_cbk cbk, int curr_level)
 {
     if (!tree_node)
         return 0;
@@ -198,7 +241,7 @@ olibc_tree_bst_get_level (olibc_tree_node_t *tree_node, void *data,
 }
 int
 olibc_tree_get_level_util (olibc_tree_node_t *tree_node, void *data,
-                           olibc_tree_cmp_func cbk, int curr_level)
+                           olibc_tree_cmp_cbk cbk, int curr_level)
 {
     int ret_level;
     if (!tree_node)
@@ -231,7 +274,7 @@ olibc_tree_get_type_level (olibc_tree_handle handle, void *data,
     tree = handle;
     tree_node = tree->head;
     *level = 0;
-    *level = olibc_tree_bst_get_level(tree_node, data, tree->cmp_func, 1);
+    *level = olibc_tree_bst_get_level(tree_node, data, tree->cmp_cbk, 1);
     return OLIBC_RETVAL_SUCCESS;
 }
 
@@ -248,7 +291,7 @@ olibc_tree_get_level (olibc_tree_handle handle, void *data,
     tree = handle;
     tree_node = tree->head;
     *level = 0;
-    *level = olibc_tree_get_level_util(tree_node, data, tree->cmp_func, 1);
+    *level = olibc_tree_get_level_util(tree_node, data, tree->cmp_cbk, 1);
     return OLIBC_RETVAL_SUCCESS;
 }
 
@@ -266,7 +309,7 @@ olibc_tree_node_new (void *data)
 olibc_retval_t
 olibc_tree_insert_node (olibc_tree_node_t *tree_node,
                         void *data,
-                        olibc_tree_cmp_func cbk)
+                        olibc_tree_cmp_cbk cbk)
 {
     if (!tree_node) {
         return OLIBC_RETVAL_FAILURE;
@@ -308,29 +351,30 @@ olibc_tree_bst_add_data (olibc_tree_head_t *tree, void *data)
         return (OLIBC_RETVAL_SUCCESS);
     }
     retval = olibc_tree_insert_node(tree->head, data,
-                                    tree->cmp_func);
+                                    tree->cmp_cbk);
     if (retval == OLIBC_RETVAL_SUCCESS)
         tree->count++;
     return retval;
 }
 
 void  olibc_tree_print_util (olibc_tree_node_t *node,
-                             olibc_tree_print_func print_func,
+                             olibc_tree_print_cbk print_cbk,
                              int level)
 {
     if (!node)
         return;
-    olibc_tree_print_util(node->right, print_func,level+1);
-    print_func(node->data, level);
-    olibc_tree_print_util(node->left, print_func,level+1);
+    olibc_tree_print_util(node->right, print_cbk,level+1);
+    print_cbk(node->data, level);
+    olibc_tree_print_util(node->left, print_cbk,level+1);
 }
 
 olibc_retval_t olibc_tree_print (olibc_tree_handle handle,
-                                olibc_tree_print_func print_func)
+                                olibc_tree_print_cbk print_cbk)
 {
     olibc_tree_head_t *tree =handle;
-    if (!handle || !print_func)
-        return OLIBC_RETVAL_SUCCESS;
+    if (!handle || !print_cbk)
+        return OLIBC_RETVAL_FAILURE;
 
-    olibc_tree_print_util(tree->head, print_func, 1);
+    olibc_tree_print_util(tree->head, print_cbk, 1);
+    return OLIBC_RETVAL_SUCCESS;
 }

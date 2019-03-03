@@ -14,12 +14,13 @@ typedef enum olibc_tree_walk_type_ {
     OLIBC_TREE_WALK_POSTORDER
 } olibc_tree_walk_type_t;
 
-typedef olibc_cbk_ret_type_t (*olibc_tree_cmp_func)(void *treedata,
+typedef olibc_cbk_ret_type_t (*olibc_tree_cmp_cbk)(void *treedata,
                                                     void *data);
-typedef void (*olibc_tree_print_func)(void *data,
-                                                      int level);
+typedef void (*olibc_tree_print_cbk)(void *data,
+                                      int level);
+typedef void (*olibc_tree_dlt_cbk)(void *tree_data);
 
-typedef void (*olibc_tree_walk_func)(void *data);
+typedef void (*olibc_tree_walk_cbk)(void *data);
 
 typedef enum olibc_tree_type_t_ {
     FOREACH_TREETYPE(GENERATE_ENUM)
@@ -31,7 +32,8 @@ static const char *olibc_tree_type_string[] = {
 
 typedef struct olibc_tree_init_t_ {
     char *name;
-    olibc_tree_cmp_func cmp_func;
+    olibc_tree_cmp_cbk cmp_cbk;
+    olibc_tree_dlt_cbk dlt_cbk;
 } olibc_tree_init_t;
 /*
 typedef enum olibc_tree_type_t_ {
@@ -52,12 +54,14 @@ extern olibc_retval_t olibc_tree_get_type(olibc_tree_handle handle,
 extern olibc_retval_t olibc_tree_add_data(olibc_tree_handle handle,
                                           void *data);
 extern olibc_retval_t olibc_tree_walk(olibc_tree_handle handle,
-                                      olibc_tree_walk_func walk_cbk,
+                                      olibc_tree_walk_cbk walk_cbk,
                                       olibc_tree_walk_type_t walk_type);
 extern olibc_retval_t olibc_tree_get_type_level(olibc_tree_handle handle,
                                            void *data, uint32_t *level);
 extern olibc_retval_t olibc_tree_get_level(olibc_tree_handle handle,
                                            void *data, uint32_t *level);
 extern olibc_retval_t olibc_tree_print(olibc_tree_handle handle,
-                                       olibc_tree_print_func print_func);
+                                       olibc_tree_print_cbk print_cbk);
+extern olibc_retval_t olibc_tree_delete_data(olibc_tree_handle handle,
+                                             void *data);
 #endif //__OLIBC_TREE_H__

@@ -1,6 +1,6 @@
 #include <olibc_tree.h>
 #include <CUnit/Basic.h>
-olibc_tree_handle handle;
+olibc_tree_handle handle = NULL;
 char *tree_name_ = "Test Tree";
 int tree_data_[10] = {5, 7, 4, 2, 8, 1, 9, 3, 6, 10};
 
@@ -24,15 +24,6 @@ int test_pclean() {
     return 1;
 }
 
-void test_tree_create ()
-{
-    olibc_tree_init_t init_struct;
-    memset(&init_struct, 0,sizeof(olibc_tree_init_t));
-    init_struct.name = tree_name_;
-    init_struct.cmp_func = test_tree_cmp_func;
-    handle = olibc_tree_create(OLIBC_TREE_TYPE_BST, &init_struct);
-    CU_ASSERT_PTR_NOT_NULL(handle);
-}
 
 void test_tree_name ()
 {
@@ -114,7 +105,7 @@ void test_tree_walk_postorder ()
 }
 void test_tree_dup_check ()
 {
-    int count;
+    int count = 0;
     olibc_retval_t retval;
 
     retval = olibc_tree_add_data(handle, tree_data_+0);
@@ -129,15 +120,15 @@ void test_tree_level ()
 {
     int level = 0;
     olibc_retval_t retval;
-    printf(" data = %d - ", *(tree_data_+1));
-    retval = olibc_tree_get_type_level(handle, tree_data_+1, &level);
+    printf(" data = %d - ", *(tree_data_+7));
+    retval = olibc_tree_get_type_level(handle, tree_data_+7, &level);
     CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
-    CU_ASSERT_TRUE(level != 0);
+    CU_ASSERT_TRUE(level == 4);
     printf(" %d ", level);
     level = 0;
-    retval = olibc_tree_get_level(handle, tree_data_+1, &level);
+    retval = olibc_tree_get_level(handle, tree_data_+7, &level);
     CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
-    CU_ASSERT_TRUE(level != 0);
+    CU_ASSERT_TRUE(level == 4);
     printf(" %d ", level);
 }
 void test_print_func (void *data, int level)
@@ -153,6 +144,28 @@ void test_tree_print ()
     printf("\n");
     retval = olibc_tree_print(handle, test_print_func);
     CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
+}
+void test_data_delete_func (void *data)
+{
+    printf(" %d ", *(int *)data);
+    CU_ASSERT_TRUE(*(int *)data == *(tree_data_ + 7));
+}
+void test_tree_data_delete ()
+{
+    olibc_retval_t retval;
+    retval = olibc_tree_delete_data(handle,
+                                    tree_data_+7);
+    CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
+}
+void test_tree_create ()
+{
+    olibc_tree_init_t init_struct;
+    memset(&init_struct, 0,sizeof(olibc_tree_init_t));
+    init_struct.name = tree_name_;
+    init_struct.cmp_cbk = test_tree_cmp_func;
+    init_struct.dlt_cbk = test_data_delete_func;
+    handle = olibc_tree_create(OLIBC_TREE_TYPE_BST, &init_struct);
+    CU_ASSERT_PTR_NOT_NULL(handle);
 }
 int main ()
 {
@@ -219,6 +232,13 @@ int main ()
     }
     if (CU_add_test(psuite, "test_tree_print",
                 test_tree_print) == NULL) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+
+    if (CU_add_test(psuite, "test_tree_data_delete",
+                test_tree_data_delete) == NULL) {
         CU_cleanup_registry();
         return CU_get_error();
     }
