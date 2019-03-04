@@ -29,10 +29,14 @@ olibc_tree_create (olibc_tree_type_t tree_type,
     return tree;
 }
 
+// preorder traversal -- root L R
+// A node's inorder successor is its right successors left most node.
+// A node's inorder predecessor is its left successors right most node.
 olibc_retval_t
 olibc_tree_delete_data_util (olibc_tree_node_t *tree_node,
                              olibc_tree_cmp_cbk cmp_cbk,
                              olibc_tree_dlt_cbk dlt_cbk,
+                             bool *data_found,
                              void *data)
 {
     if (!tree_node) {
@@ -42,14 +46,15 @@ olibc_tree_delete_data_util (olibc_tree_node_t *tree_node,
 
     switch (cbk_retval) {
         case OLIBC_CBK_RET_EQUAL:
+            *data_found = true;
             dlt_cbk(data);
             return OLIBC_RETVAL_SUCCESS;
         case OLIBC_CBK_RET_GRTR:
             return olibc_tree_delete_data_util(tree_node->right, cmp_cbk,
-                                               dlt_cbk, data);
+                                               dlt_cbk, data_found, data);
         case OLIBC_CBK_RET_LSR:
             return olibc_tree_delete_data_util(tree_node->left, cmp_cbk,
-                                               dlt_cbk, data);
+                                               dlt_cbk,data_found,data);
         default:
             return 0;
     }
@@ -60,12 +65,19 @@ olibc_retval_t
 olibc_tree_delete_data (olibc_tree_handle handle, void *data)
 {
     olibc_tree_head_t *tree = NULL;
+    olibc_retval_t retval;
+    bool data_found = false;
     if (!handle) {
         return OLIBC_RETVAL_FAILURE;
     }
     tree = handle;
-    return olibc_tree_delete_data_util(tree->head, tree->cmp_cbk,
-            tree->dlt_cbk, data);
+
+    retval = olibc_tree_delete_data_util(tree->head, tree->cmp_cbk,
+            tree->dlt_cbk, &data_found, data);
+    if (!data_found && retval == OLIBC_RETVAL_SUCCESS) {
+        return OLIBC_RETVAL_DATA_NOT_FOUND;
+    }
+    return retval;
 }
 
 

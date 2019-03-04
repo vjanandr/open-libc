@@ -8,6 +8,7 @@ typedef enum olibc_retval_t_ {
     OLIBC_RETVAL_FAILURE,
     OLIBC_RETVAL_DUPLICATE_DATA,
     OLIBC_RETVAL_INVALID_SWITCH,
+    OLIBC_RETVAL_DATA_NOT_FOUND,
 } olibc_retval_t;
 
 typedef enum olibc_callbk_ret_type_t_ {

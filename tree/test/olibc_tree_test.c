@@ -153,9 +153,14 @@ void test_data_delete_func (void *data)
 void test_tree_data_delete ()
 {
     olibc_retval_t retval;
+    int td = 15;
     retval = olibc_tree_delete_data(handle,
                                     tree_data_+7);
     CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
+    retval = olibc_tree_delete_data(handle,
+                                    &td);
+    CU_ASSERT_TRUE(retval == OLIBC_RETVAL_DATA_NOT_FOUND);
+
 }
 void test_tree_create ()
 {
