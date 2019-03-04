@@ -45,7 +45,7 @@ olibc_get_inorder_successor_util (olibc_tree_node_t * tree_node)
 olibc_tree_node_t*
 olibc_tree_delete_data_util (olibc_tree_node_t *tree_node,
                              olibc_tree_cmp_cbk cmp_cbk,
-                             olibc_tree_dlt_cbk dlt_cbk,
+                             olibc_tree_node_dlt_cbk dlt_cbk,
                              bool *data_found,
                              void *data)
 {
@@ -153,6 +153,25 @@ olibc_tree_get_count (olibc_tree_handle handle, int *count)
     *count = tree->count;
     return (OLIBC_RETVAL_SUCCESS);
 }
+olibc_tree_node_t*
+olibc_tree_postorder_del (olibc_tree_node_t *node, 
+                          olibc_tree_node_dlt_cbk dlt_cbk)
+{
+    if (!node) {
+        return NULL;
+    }
+
+    if (node->left)
+        node->left = olibc_tree_postorder_del(node->left, 
+                                               dlt_cbk);
+
+    if (node->right)
+        node->right = olibc_tree_postorder_del(node->right, 
+                                                dlt_cbk);
+
+    dlt_cbk(node->data);
+    return NULL;
+}
 
 olibc_retval_t
 olibc_tree_destroy (olibc_tree_handle *handle)
@@ -160,7 +179,9 @@ olibc_tree_destroy (olibc_tree_handle *handle)
     olibc_tree_head_t *tree = *handle;
     if (!tree)
         return OLIBC_RETVAL_FAILURE;
-    free (tree);
+    // postorder walk.
+    tree->head = olibc_tree_postorder_del(tree->head, tree->dlt_cbk);
+    free(tree);
     *handle = NULL;
     return (OLIBC_RETVAL_SUCCESS);
 }

@@ -16,7 +16,7 @@ typedef struct olibc_tree_head_t_ {
     int count;
     olibc_tree_type_t tree_type;
     olibc_tree_cmp_cbk cmp_cbk;
-    olibc_tree_dlt_cbk dlt_cbk;
+    olibc_tree_node_dlt_cbk dlt_cbk;
     olibc_tree_level_func level_func;
     char *name;
 } olibc_tree_head_t;

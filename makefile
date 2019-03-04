@@ -27,7 +27,7 @@ treetest.o: olibc_tree.o ./tree/test/olibc_tree_test.c
 	$(cc) $(CFLAGS) $(INC_DIRS) -o treetest $^ -lcunit
 
 treetest: treetest.o
-	ls
+	./treetest
 
 treetestmem: treetest.o
 	valgrind --tool=memcheck --leak-check=full --error-exitcode=9 ./treetest || (echo "Leak detected"; exit 1)

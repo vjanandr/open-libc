@@ -18,7 +18,7 @@ typedef olibc_cbk_ret_type_t (*olibc_tree_cmp_cbk)(void *treedata,
                                                     void *data);
 typedef void (*olibc_tree_print_cbk)(void *data,
                                       int level);
-typedef void (*olibc_tree_dlt_cbk)(void *tree_data);
+typedef void (*olibc_tree_node_dlt_cbk)(void *tree_data);
 
 typedef void (*olibc_tree_walk_cbk)(void *data);
 
@@ -33,7 +33,7 @@ static const char *olibc_tree_type_string[] = {
 typedef struct olibc_tree_init_t_ {
     char *name;
     olibc_tree_cmp_cbk cmp_cbk;
-    olibc_tree_dlt_cbk dlt_cbk;
+    olibc_tree_node_dlt_cbk dlt_cbk;
 } olibc_tree_init_t;
 /*
 typedef enum olibc_tree_type_t_ {
