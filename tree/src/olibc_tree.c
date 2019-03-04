@@ -29,36 +29,84 @@ olibc_tree_create (olibc_tree_type_t tree_type,
     return tree;
 }
 
+olibc_tree_node_t*
+olibc_get_inorder_successor_util (olibc_tree_node_t * tree_node)
+{
+    if (tree_node)
+        while(tree_node->left) {
+            tree_node = tree_node->left;
+        }
+    return tree_node;
+}
 // preorder traversal -- root L R
 // A node's inorder successor is its right successors left most node.
-// A node's inorder predecessor is its left successors right most node.
-olibc_retval_t
+// A node's i}norder predecessor is its left successors right most node.
+// IF there is a match the function will return the new node that will replace the matched node.
+olibc_tree_node_t*
 olibc_tree_delete_data_util (olibc_tree_node_t *tree_node,
                              olibc_tree_cmp_cbk cmp_cbk,
                              olibc_tree_dlt_cbk dlt_cbk,
                              bool *data_found,
                              void *data)
 {
+    olibc_tree_node_t *new_node = NULL;
+//    olibc_tree_node_t *new_node = NULL;
+
     if (!tree_node) {
-        return OLIBC_RETVAL_SUCCESS;
+        return NULL;
     }
     olibc_cbk_ret_type_t cbk_retval = cmp_cbk(tree_node->data, data);
 
     switch (cbk_retval) {
         case OLIBC_CBK_RET_EQUAL:
             *data_found = true;
-            dlt_cbk(data);
-            return OLIBC_RETVAL_SUCCESS;
+            if (dlt_cbk)
+                dlt_cbk(data);
+            if (tree_node->left == NULL) {
+                new_node = tree_node->right;
+                free(new_node);
+                return new_node;
+            }
+            if (tree_node->right == NULL) {
+                new_node = tree_node->left;
+                free(tree_node);
+                return new_node;
+            }
+            /*
+            // Both left and right nodes exists.
+            // find the inorder successor ie left most node in the right subtree.
+            curr = tree_node->right;
+            prev = tree_node;
+            while (curr->left) {
+                prev = curr;
+                curr = curr->left;
+            }
+            if (tree_node->right == curr) {
+                tree_node->right = curr->right;
+            }
+            prev->left = curr->right;
+            tree_node->data = curr->data;
+            free(curr);
+            */
+            new_node = olibc_get_inorder_successor_util(tree_node->right);
+            tree_node->data = new_node->data;
+            new_node->right = olibc_tree_delete_data_util(tree_node->right,
+                    cmp_cbk, NULL, data_found,tree_node->data);
+
+            // We could have called delete_data_util again recursively with curr->data as key.
+            // But we already know that curr->left is NULL and hence prev->node left should be curr->right.
+            // This is just to avoid recursively calling again until we reach the left most node.
+            return new_node;
         case OLIBC_CBK_RET_GRTR:
-            return olibc_tree_delete_data_util(tree_node->right, cmp_cbk,
+            tree_node->right = olibc_tree_delete_data_util(tree_node->right, cmp_cbk,
                                                dlt_cbk, data_found, data);
         case OLIBC_CBK_RET_LSR:
-            return olibc_tree_delete_data_util(tree_node->left, cmp_cbk,
-                                               dlt_cbk,data_found,data);
+            tree_node->left = olibc_tree_delete_data_util(tree_node->left, cmp_cbk,
+                                               dlt_cbk, data_found, data);
         default:
-            return 0;
+            return tree_node;
     }
-    return OLIBC_RETVAL_SUCCESS;
+    return tree_node;
 }
 
 olibc_retval_t
@@ -72,12 +120,13 @@ olibc_tree_delete_data (olibc_tree_handle handle, void *data)
     }
     tree = handle;
 
-    retval = olibc_tree_delete_data_util(tree->head, tree->cmp_cbk,
-            tree->dlt_cbk, &data_found, data);
-    if (!data_found && retval == OLIBC_RETVAL_SUCCESS) {
+    tree->head = olibc_tree_delete_data_util(tree->head, tree->cmp_cbk,
+                                             tree->dlt_cbk, &data_found, data);
+    if (!data_found) {
         return OLIBC_RETVAL_DATA_NOT_FOUND;
     }
-    return retval;
+    tree->count -= 1;
+    return OLIBC_RETVAL_SUCCESS;
 }
 
 

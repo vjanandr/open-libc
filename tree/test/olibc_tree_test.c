@@ -2,7 +2,23 @@
 #include <CUnit/Basic.h>
 olibc_tree_handle handle = NULL;
 char *tree_name_ = "Test Tree";
-int tree_data_[10] = {5, 7, 4, 2, 8, 1, 9, 3, 6, 10};
+int tree_data_[30] = {
+    67, 42,
+    63, 91,
+    32, 18,
+    89, 5,
+    27, 84,
+    2, 81,
+    109, 239,
+    35, 66,
+    10, 30,
+    24,78,
+    79, 47,
+    15, 33,
+    28, 87,
+    54, 17,
+    37, 29
+};
 
 olibc_cbk_ret_type_t test_tree_cmp_func (void *tree_data, void *data)
 {
@@ -62,15 +78,18 @@ void test_tree_add ()
     int count, i =0;
     olibc_retval_t retval;
 
-    while (i < 10) {
+    while (i < 30) {
         retval = olibc_tree_add_data(handle, tree_data_+i);
         CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
+        if (retval != OLIBC_RETVAL_SUCCESS) {
+            printf("%d, %d \n", i, tree_data_[i]);
+        }
         i++;
     }
 
     retval = olibc_tree_get_count(handle, &count);
     CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
-    CU_ASSERT_EQUAL(count, 10);
+    CU_ASSERT_EQUAL(count, 30);
 }
 void test_tree_walk_cbk (void *data)
 {
@@ -113,7 +132,7 @@ void test_tree_dup_check ()
 
     retval = olibc_tree_get_count(handle, &count);
     CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
-    CU_ASSERT_EQUAL(count, 10);
+    CU_ASSERT_EQUAL(count, 30);
 }
 
 void test_tree_level ()
@@ -123,20 +142,24 @@ void test_tree_level ()
     printf(" data = %d - ", *(tree_data_+7));
     retval = olibc_tree_get_type_level(handle, tree_data_+7, &level);
     CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
-    CU_ASSERT_TRUE(level == 4);
+    CU_ASSERT_TRUE(level == 5);
     printf(" %d ", level);
     level = 0;
     retval = olibc_tree_get_level(handle, tree_data_+7, &level);
     CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
-    CU_ASSERT_TRUE(level == 4);
+    CU_ASSERT_TRUE(level == 5);
     printf(" %d ", level);
 }
 void test_print_func (void *data, int level)
 {
     level--;
     level *= 10;
+    CU_ASSERT_PTR_NOT_NULL(data);
     while (level--) printf(" ");
-    printf("%d\n\n\n", *(int *)data);
+    if (data)
+        printf("%d\n", *(int *)data);
+    else
+        printf("nill\n");
 }
 void test_tree_print ()
 {
@@ -147,20 +170,24 @@ void test_tree_print ()
 }
 void test_data_delete_func (void *data)
 {
-    printf(" %d ", *(int *)data);
-    CU_ASSERT_TRUE(*(int *)data == *(tree_data_ + 7));
+    printf(" %d \n", *(int *)data);
+    CU_ASSERT_TRUE(*(int *)data == *(tree_data_ + 2));
 }
 void test_tree_data_delete ()
 {
     olibc_retval_t retval;
-    int td = 15;
+    int count;
+    int td = tree_data_[2];
     retval = olibc_tree_delete_data(handle,
-                                    tree_data_+7);
+                                    tree_data_+2);
     CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
     retval = olibc_tree_delete_data(handle,
                                     &td);
     CU_ASSERT_TRUE(retval == OLIBC_RETVAL_DATA_NOT_FOUND);
-
+    test_tree_print();
+    retval = olibc_tree_get_count(handle, &count);
+    CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
+    CU_ASSERT_EQUAL(count, 29);
 }
 void test_tree_create ()
 {
