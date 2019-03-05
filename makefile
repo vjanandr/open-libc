@@ -29,6 +29,9 @@ treetest.o: olibc_tree.o ./tree/test/olibc_tree_test.c
 treetest: treetest.o
 	./treetest
 
+simple: treetest.o
+	ls
+
 treetestmem: treetest.o
 	valgrind --tool=memcheck --leak-check=full --error-exitcode=9 ./treetest || (echo "Leak detected"; exit 1)
 

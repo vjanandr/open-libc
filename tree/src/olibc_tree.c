@@ -64,7 +64,7 @@ olibc_tree_delete_data_util (olibc_tree_node_t *tree_node,
                 dlt_cbk(data);
             if (tree_node->left == NULL) {
                 new_node = tree_node->right;
-                free(new_node);
+                free(tree_node);
                 return new_node;
             }
             if (tree_node->right == NULL) {
@@ -90,13 +90,13 @@ olibc_tree_delete_data_util (olibc_tree_node_t *tree_node,
             */
             new_node = olibc_get_inorder_successor_util(tree_node->right);
             tree_node->data = new_node->data;
-            new_node->right = olibc_tree_delete_data_util(tree_node->right,
+            tree_node->right = olibc_tree_delete_data_util(tree_node->right,
                     cmp_cbk, NULL, data_found,tree_node->data);
 
             // We could have called delete_data_util again recursively with curr->data as key.
             // But we already know that curr->left is NULL and hence prev->node left should be curr->right.
             // This is just to avoid recursively calling again until we reach the left most node.
-            return new_node;
+            return tree_node;
         case OLIBC_CBK_RET_GRTR:
             tree_node->right = olibc_tree_delete_data_util(tree_node->right, cmp_cbk,
                                                dlt_cbk, data_found, data);
@@ -170,6 +170,7 @@ olibc_tree_postorder_del (olibc_tree_node_t *node,
                                                 dlt_cbk);
 
     dlt_cbk(node->data);
+    free(node);
     return NULL;
 }
 

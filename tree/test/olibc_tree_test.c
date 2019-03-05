@@ -24,6 +24,8 @@ int boolvar = 1;
 olibc_cbk_ret_type_t test_tree_cmp_func (void *tree_data, void *data)
 {
    int tree_int, data_int;
+   if (!data || !tree_data)
+       return 10;
    tree_int = *(int *)tree_data;
    data_int = *(int *)data;
    if (data_int > tree_int)
@@ -173,15 +175,15 @@ void test_data_delete_func (void *data)
 {
     printf(" %d \n", *(int *)data);
     if (boolvar)
-        CU_ASSERT_TRUE(*(int *)data == *(tree_data_ + 2));
+        CU_ASSERT_TRUE(*(int *)data == *(tree_data_ + 8));
 }
 void test_tree_data_delete ()
 {
     olibc_retval_t retval;
     int count;
-    int td = tree_data_[2];
+    int td = tree_data_[8];
     retval = olibc_tree_delete_data(handle,
-                                    tree_data_+2);
+                                    tree_data_+8);
     CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
     retval = olibc_tree_delete_data(handle,
                                     &td);
@@ -213,7 +215,6 @@ int main ()
         CU_cleanup_registry();
         return CU_get_error();
     }
-
     if (CU_add_test(psuite, "test_tree_create",
                 test_tree_create) == NULL) {
         CU_cleanup_registry();
