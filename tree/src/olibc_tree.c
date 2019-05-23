@@ -461,3 +461,63 @@ olibc_retval_t olibc_tree_print (olibc_tree_handle handle,
     olibc_tree_print_util(tree->head, print_cbk, 1);
     return OLIBC_RETVAL_SUCCESS;
 }
+
+int olibc_tree_get_height_util (olibc_tree_node_t *node)
+{
+    int lheight, rheight;
+    if (!node) 
+        return 0;
+
+    lheight = olibc_tree_get_height_util(node->left) + 1;
+    rheight = olibc_tree_get_height_util(node->right) + 1;
+    if (rheight > lheight) 
+        return rheight;
+    return lheight;
+}
+
+olibc_retval_t olibc_tree_get_height (olibc_tree_handle handle,
+                                      int *height)
+{
+    olibc_tree_head_t *tree = handle;
+    if (!handle || !height) 
+        return OLIBC_RETVAL_FAILURE;
+
+    *height = olibc_tree_get_height_util(tree->head);
+    return OLIBC_RETVAL_SUCCESS;
+}
+
+int max (int a , int b)
+{
+    return (a > b ? a:b);
+}
+
+olibc_retval_t
+olibc_tree_get_diameter_util (olibc_tree_node_t *node)
+{
+    int lheight, rheight;
+    int tmpdia, ldia, rdia;
+
+    if (!node) {
+        return 0;
+    }
+    
+    lheight = olibc_tree_get_height_util(node->left);
+    rheight = olibc_tree_get_height_util(node->right);
+
+    ldia = olibc_tree_get_diameter_util(node->left);
+    rdia = olibc_tree_get_diameter_util(node->right);
+    tmpdia = max(lheight + rheight + 1, max(ldia, rdia));
+    return tmpdia;
+}
+
+olibc_retval_t
+olibc_tree_get_diameter(olibc_tree_handle handle,
+                        int *dia)
+{
+    olibc_tree_head_t *tree = handle;
+    if (!handle || !dia) 
+        return OLIBC_RETVAL_FAILURE;
+
+    *dia = olibc_tree_get_diameter_util(tree->head);
+    return OLIBC_RETVAL_SUCCESS;
+}

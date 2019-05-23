@@ -137,7 +137,25 @@ void test_tree_dup_check ()
     CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
     CU_ASSERT_EQUAL(count, 30);
 }
+void
+test_tree_diameter ()
+{
+    int dia = 0;
+    olibc_retval_t retval;
+    retval = olibc_tree_get_diameter(handle, &dia);
+    CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
+    printf("\n diameter %d", dia);
 
+}
+void
+test_tree_height ()
+{
+    int height = 0;
+    olibc_retval_t retval;
+    retval = olibc_tree_get_height(handle, &height);
+    CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
+    printf("\n height %d", height);
+}
 void test_tree_level ()
 {
     int level = 0;
@@ -267,6 +285,16 @@ int main ()
     }
     if (CU_add_test(psuite, "test_tree_print",
                 test_tree_print) == NULL) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+    if (CU_add_test(psuite, "test_tree_height",
+                test_tree_height) == NULL) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+    if (CU_add_test(psuite, "test_tree_diameter",
+                test_tree_diameter) == NULL) {
         CU_cleanup_registry();
         return CU_get_error();
     }
