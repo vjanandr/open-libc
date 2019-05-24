@@ -69,4 +69,5 @@ extern olibc_retval_t olibc_tree_get_height(olibc_tree_handle handle,
 
 extern olibc_retval_t olibc_tree_get_diameter(olibc_tree_handle handle,
                                               int *dia);
+extern olibc_retval_t olibc_tree_print_paths(olibc_tree_handle handle);
 #endif //__OLIBC_TREE_H__

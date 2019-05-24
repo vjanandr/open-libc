@@ -521,3 +521,35 @@ olibc_tree_get_diameter(olibc_tree_handle handle,
     *dia = olibc_tree_get_diameter_util(tree->head);
     return OLIBC_RETVAL_SUCCESS;
 }
+void
+olibc_tree_print_paths_utils (olibc_tree_node_t *node, int path_length, 
+                              int *path_arr)
+{
+    int i= 0;
+    if (!node) {
+        return;
+    }
+
+    path_arr[path_length++] = *((int *)(node->data));
+    if (!node->left && !node->right) {
+        while (i < path_length) {
+            printf("%d ",path_arr[i++]);
+        }
+        printf("\n");
+        return;
+    }
+    olibc_tree_print_paths_utils(node->left, path_length, path_arr);
+    olibc_tree_print_paths_utils(node->right, path_length, path_arr);
+}
+olibc_retval_t 
+olibc_tree_print_paths (olibc_tree_handle handle)
+{
+    olibc_tree_head_t *tree = handle;
+    int path_arr[40];
+    int path_length = 0;
+    if (!handle)
+        return OLIBC_RETVAL_FAILURE;
+    olibc_tree_print_paths_utils(tree->head, path_length, path_arr);
+    return OLIBC_RETVAL_SUCCESS;
+
+}

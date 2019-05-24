@@ -147,6 +147,13 @@ test_tree_diameter ()
     printf("\n diameter %d", dia);
 
 }
+void test_tree_paths ()
+{
+    olibc_retval_t retval;
+    retval = olibc_tree_print_paths(handle);
+    CU_ASSERT_TRUE(retval == OLIBC_RETVAL_SUCCESS);
+}
+
 void
 test_tree_height ()
 {
@@ -221,12 +228,21 @@ void test_tree_create ()
     handle = olibc_tree_create(OLIBC_TREE_TYPE_BST, &init_struct);
     CU_ASSERT_PTR_NOT_NULL(handle);
 }
+void
+test_tree_inorder_preorder ()
+{
+    olibc_retval_t retval;
+    int in[] = {'D', 'B', 'E', 'A', 'F', 'C'};
+    int pre[] = {'A', 'B', 'D', 'E', 'C', 'F'};
+    int len = sizeof(in)/sizeof(in[0]);
+}
 int main ()
 {
     if (CUE_SUCCESS != CU_initialize_registry()) {
         return CU_get_error();
     }
     CU_pSuite  psuite = NULL;
+
 
     psuite = CU_add_suite("Tree test", NULL, NULL);
     if (psuite == NULL) {
@@ -235,6 +251,11 @@ int main ()
     }
     if (CU_add_test(psuite, "test_tree_create",
                 test_tree_create) == NULL) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+    if (CU_add_test(psuite, "test_tree_inorder_preorder",
+                test_tree_in_preorder)) {
         CU_cleanup_registry();
         return CU_get_error();
     }
@@ -295,6 +316,11 @@ int main ()
     }
     if (CU_add_test(psuite, "test_tree_diameter",
                 test_tree_diameter) == NULL) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+    if (CU_add_test(psuite, "test_tree_paths",
+                test_tree_paths) == NULL) {
         CU_cleanup_registry();
         return CU_get_error();
     }
