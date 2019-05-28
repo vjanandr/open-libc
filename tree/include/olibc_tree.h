@@ -5,6 +5,7 @@
 #include <stdbool.h>
 
 #define FOREACH_TREETYPE(TYPE) \
+        TYPE(OLIBC_TREE_TYPE_DEFAULT) \
         TYPE(OLIBC_TREE_TYPE_BST) \
         TYPE(OLIBC_TREE_TYPE_AVL)
 

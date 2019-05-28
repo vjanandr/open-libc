@@ -225,7 +225,7 @@ void test_tree_create ()
     init_struct.name = tree_name_;
     init_struct.cmp_cbk = test_tree_cmp_func;
     init_struct.dlt_cbk = test_data_delete_func;
-    handle = olibc_tree_create(OLIBC_TREE_TYPE_BST, &init_struct);
+    handle = olibc_tree_create(OLIBC_TREE_TYPE_DEFAULT, &init_struct);
     CU_ASSERT_PTR_NOT_NULL(handle);
 }
 void
@@ -235,6 +235,7 @@ test_tree_inorder_preorder ()
     int in[] = {'D', 'B', 'E', 'A', 'F', 'C'};
     int pre[] = {'A', 'B', 'D', 'E', 'C', 'F'};
     int len = sizeof(in)/sizeof(in[0]);
+
 }
 int main ()
 {

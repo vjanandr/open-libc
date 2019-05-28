@@ -40,8 +40,9 @@ olibc_get_inorder_successor_util (olibc_tree_node_t * tree_node)
 }
 // preorder traversal -- root L R
 // A node's inorder successor is its right successors left most node.
-// A node's i}norder predecessor is its left successors right most node.
+// A node's inorder predecessor is its left successors right most node.
 // IF there is a match the function will return the new node that will replace the matched node.
+// When a node is deleted its  replaced with its inorder successor ie, right subtrees left most node.
 olibc_tree_node_t*
 olibc_tree_delete_data_util (olibc_tree_node_t *tree_node,
                              olibc_tree_cmp_cbk cmp_cbk,
@@ -74,7 +75,8 @@ olibc_tree_delete_data_util (olibc_tree_node_t *tree_node,
             }
             /*
             // Both left and right nodes exists.
-            // find the inorder successor ie left most node in the right subtree.
+            // find the inorder successor ie left most node 
+            // in the right subtree.
             curr = tree_node->right;
             prev = tree_node;
             while (curr->left) {
@@ -93,15 +95,20 @@ olibc_tree_delete_data_util (olibc_tree_node_t *tree_node,
             tree_node->right = olibc_tree_delete_data_util(tree_node->right,
                     cmp_cbk, NULL, data_found,tree_node->data);
 
-            // We could have called delete_data_util again recursively with curr->data as key.
-            // But we already know that curr->left is NULL and hence prev->node left should be curr->right.
-            // This is just to avoid recursively calling again until we reach the left most node.
+            // We could have called delete_data_util again recursively 
+            // with curr->data as key.
+            // But we already know that curr->left is NULL and 
+            // hence prev->node left should be curr->right.
+            // This is just to avoid recursively calling again 
+            // until we reach the left most node.
             return tree_node;
         case OLIBC_CBK_RET_GRTR:
-            tree_node->right = olibc_tree_delete_data_util(tree_node->right, cmp_cbk,
+            tree_node->right = 
+                olibc_tree_delete_data_util(tree_node->right, cmp_cbk,
                                                dlt_cbk, data_found, data);
         case OLIBC_CBK_RET_LSR:
-            tree_node->left = olibc_tree_delete_data_util(tree_node->left, cmp_cbk,
+            tree_node->left = 
+                olibc_tree_delete_data_util(tree_node->left, cmp_cbk,
                                                dlt_cbk, data_found, data);
         default:
             return tree_node;

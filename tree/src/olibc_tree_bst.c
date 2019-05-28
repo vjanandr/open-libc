@@ -60,4 +60,3 @@ olibc_tree_bst_add_data (olibc_tree_head_t *tree, void *data)
     if (retval == OLIBC_RETVAL_SUCCESS)
         tree->count++;
 }
-
